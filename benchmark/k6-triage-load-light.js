@@ -1,8 +1,10 @@
-// Benchmark de overhead OTel (Fase 4). Uso:
+// Benchmark de overhead OTel (Fase 4) - carga LIGERA (Prueba 1: 20 VUs, 45s). Uso:
 //
 //   docker run --rm --network <net> -e TARGET_URL=http://<triage-host>:8081 \
-//     -v "$(pwd)/benchmark:/scripts" grafana/k6:latest run /scripts/k6-triage-load.js
+//     -v "$(pwd)/benchmark:/scripts" grafana/k6:latest run /scripts/k6-triage-load-light.js
 //
+// Para la carga realista recomendada (50-100 usuarios, 5 min) usar
+// k6-triage-load-realistic.js en su lugar.
 // Ver docs/OTEL_OVERHEAD_BENCHMARK.md para la metodología completa y resultados.
 
 import http from 'k6/http';
@@ -30,13 +32,13 @@ let counter = 0;
 
 export default function () {
   counter += 1;
-  const reportId = `BENCH-${__VU}-${__ITER}-${counter}-${Date.now()}`;
+  const reportId = `BENCH-LIGHT-${__VU}-${__ITER}-${counter}-${Date.now()}`;
 
   const payload = JSON.stringify({
     report_id: reportId,
     patient_age: 30 + (counter % 50),
     symptoms: ['fiebre alta'],
-    description: 'k6 overhead benchmark',
+    description: 'k6 overhead benchmark - carga ligera',
   });
 
   const res = http.post(`${__ENV.TARGET_URL}/triage`, payload, {

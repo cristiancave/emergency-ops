@@ -115,10 +115,14 @@ awsxray (trazas) + prometheus (métricas)`.
 
 ### Fase 4 — Overhead de la instrumentación
 
-Ver [docs/OTEL_OVERHEAD_BENCHMARK.md](docs/OTEL_OVERHEAD_BENCHMARK.md) para la metodología
-completa. Resumen: con el Collector funcionando (no reintentos fallidos), el overhead es de
-un solo dígito en p99 (~6%) y CPU (~2.5%); unos pocos MiB de memoria en términos absolutos.
-Script de carga en [benchmark/k6-triage-load.js](benchmark/k6-triage-load.js).
+Ver [docs/OTEL_OVERHEAD_BENCHMARK.md](docs/OTEL_OVERHEAD_BENCHMARK.md) para la metodología y
+resultados completos de las dos pruebas: carga ligera (20 VUs) y carga realista sostenida (80
+VUs por 5 min, con límites de CPU/memoria por contenedor). Resumen: overhead de ~6% en p99 bajo
+carga ligera, ~18% bajo carga sostenida — memoria +23-30% relativo (pocos MiB absolutos en
+ambos casos), CPU sin cambio neto bajo carga alta por saturación del límite del contenedor.
+Scripts de carga en
+[benchmark/k6-triage-load-light.js](benchmark/k6-triage-load-light.js) y
+[benchmark/k6-triage-load-realistic.js](benchmark/k6-triage-load-realistic.js).
 
 ## Probar el sistema desplegado / ver los datos en vivo
 

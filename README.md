@@ -109,7 +109,13 @@ awsxray (trazas) + prometheus (métricas)`.
 - **Trazas**: AWS X-Ray.
 - **Métricas**: Prometheus (self-hosted en ECS) + Grafana, dashboard *"Emergency Ops - SLIs"*
   con 6 paneles: request rate, error rate %, p99 latency, conexiones DB abiertas (saturación),
-  CPU (vía datasource nativo de CloudWatch), y errores del Collector.
+  CPU (vía datasource nativo de CloudWatch), y errores del Collector. `/metrics` se sirve en
+  formato **OpenMetrics** (no el texto clásico de Prometheus) porque es el único que puede
+  llevar **exemplars**: el SDK de OTel adjunta automáticamente el `trace_id` de la request activa
+  a cada muestra de un histograma (ej. `http_server_request_duration_seconds_bucket`), así un
+  punto del panel de p99 latency en Grafana enlaza directo a la traza X-Ray que lo generó — la
+  tercera pata de la correlación cross-signal (trazas ↔ métricas), sumada a trazas ↔ logs de
+  abajo.
 - **Logs**: JSON estructurado con `trace_id`/`span_id`, enviado a CloudWatch Logs vía el driver
   `awslogs` de ECS — se correlaciona con trazas usando `trace_id` como pivot.
 

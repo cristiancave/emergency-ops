@@ -9,6 +9,7 @@ import (
 	"os"
 	"time"
 
+	promclient "github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
@@ -79,7 +80,14 @@ func Init(ctx context.Context, cfg Config) (shutdown Shutdown, metricsHandler ht
 
 	_ = promExporter // el exporter se registra solo; no necesitamos su referencia directa
 
-	handler := promhttp.Handler()
+	// EnableOpenMetrics: el formato clásico de texto de Prometheus no puede
+	// serializar exemplars (el link métrica -> trace_id). OpenMetrics sí. El
+	// SDK de OTel ya captura exemplars automáticamente por default (usa
+	// exemplar.TraceBasedFilter: cualquier medición hecha con un span activo
+	// en el contexto queda como candidata) — esto solo habilita exponerlos.
+	handler := promhttp.HandlerFor(promclient.DefaultGatherer, promhttp.HandlerOpts{
+		EnableOpenMetrics: true,
+	})
 
 	shutdown = func(ctx context.Context) error {
 		if err := tp.Shutdown(ctx); err != nil {

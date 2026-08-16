@@ -47,6 +47,12 @@ Todo el tráfico interno (Collector, Prometheus, service-to-service metrics scra
 resuelve por DNS privado vía **AWS Cloud Map** (`*.emergency-ops.local`), no por IPs de tarea
 que cambian en cada deploy.
 
+Este diagrama simplifica a una sola nube por claridad. `dispatch` y `triage` en realidad mandan
+cada traza dos veces en paralelo: al Collector de AWS de arriba, y a un segundo Collector en
+**GCP Cloud Run** → Cloud Trace (ver Fase 2 abajo). El diagrama completo con ambas nubes está en
+[`docs/architecture.drawio`](https://github.com/cristiancave/emergency-ops-infrastructure/blob/main/docs/architecture.drawio)
+del repo de infraestructura.
+
 ## Los dos servicios
 
 | Servicio | Rol | Persistencia | Puerto |
@@ -99,10 +105,20 @@ abajo, un error justamente en este punto quedó documentado ahí):
 
 ### Fase 2 — OTel Collector
 
-Desplegado en ECS Fargate con la distribución ADOT (`aws-otel-collector`), config en SSM
-Parameter Store (inyectada como env var, leída con el provider `env:`). Pipeline:
-`receiver OTLP (gRPC+HTTP)` → `processors memory_limiter+resource+batch` → `exporters
-awsxray (trazas) + prometheus (métricas)`.
+Desplegado en **dos nubes** — requisito "Excelente" de la rúbrica:
+
+- **AWS** (principal): ECS Fargate con la distribución ADOT (`aws-otel-collector`), config en SSM
+  Parameter Store (inyectada como env var, leída con el provider `env:`). Pipeline: `receiver
+  OTLP (gRPC+HTTP)` → `processors memory_limiter+resource+batch` → `exporters awsxray (trazas) +
+  prometheus (métricas)`.
+- **GCP** (secundario, mismas trazas en paralelo): Cloud Run con
+  `otel/opentelemetry-collector-contrib`, receiver OTLP/HTTP, exporter `googlecloud` → Cloud
+  Trace. `pkg/telemetry.go` registra un segundo `WithBatcher` en el `TracerProvider` cuando
+  `OTEL_EXPORTER_OTLP_ENDPOINT_GCP` está seteado — cada span sale a ambos Collectors, no hay
+  duplicación manual de código. Ver la sección "Multi-cloud" del README de
+  [emergency-ops-infrastructure](https://github.com/cristiancave/emergency-ops-infrastructure)
+  para la arquitectura completa y cómo verificar el mismo `trace_id` en X-Ray (AWS) y Cloud Trace
+  (GCP).
 
 ### Fase 3 — Backends y visualización
 

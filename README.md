@@ -131,6 +131,10 @@ ambiente `dev`. Autenticación AWS vía OIDC (IAM Role, sin access keys estátic
 
 - `dispatch` no libera ambulancias tras el ETA — bajo carga sostenida el pool se agota (visible
   en el benchmark de Fase 4, que por eso mide contra `triage`).
-- `incident_latitude`/`incident_longitude` a veces devuelven `0` en la respuesta de
-  `POST /dispatch` — posible mismatch de nombre de campo en el DTO, sin investigar a fondo.
+- ~~`incident_latitude`/`incident_longitude` a veces devuelven `0`~~ — **resuelto**: no era un
+  bug de la app. El DTO de `POST /dispatch` espera campos planos `incident_latitude`/
+  `incident_longitude`, no un objeto anidado `incident_location`; varios payloads de prueba
+  usados durante el desarrollo (incluido en este repo antes del fix) mandaban el objeto anidado,
+  que Go ignora silenciosamente por default, dejando lat/long en `0`. Ver
+  `emergency-ops-infrastructure/scripts/generate-demo-traffic.ps1` para el payload correcto.
 - Sin HTTPS ni WAF en el ALB (aceptable para `dev`, no para producción).

@@ -1,0 +1,73 @@
+name: Build & Push to ECR
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'services/**'
+      - 'pkg/**'
+      - 'go.work'
+      - '.github/workflows/build-push.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'services/**'
+      - 'pkg/**'
+      - 'go.work'
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: 149511939303.dkr.ecr.us-east-1.amazonaws.com
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [dispatch, triage]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: services/${{ matrix.service }}/go.mod
+
+      - name: Run tests
+        working-directory: services/${{ matrix.service }}
+        run: go test ./...
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      id-token: write
+      contents: read
+    strategy:
+      matrix:
+        service: [dispatch, triage]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image
+        working-directory: services/${{ matrix.service }}
+        env:
+          IMAGE_URI: ${{ env.ECR_REGISTRY }}/emergency-ops-${{ matrix.service }}
+        run: |
+          docker build -t "$IMAGE_URI:${{ github.sha }}" -t "$IMAGE_URI:latest" .
+          docker push "$IMAGE_URI:${{ github.sha }}"
+          docker push "$IMAGE_URI:latest"

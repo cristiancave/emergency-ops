@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  triage:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: triage-service
+    ports:
+      - "8081:8081"
+    environment:
+      - TRIAGE_PORT=8081
+      - TRIAGE_SHUTDOWN_TIMEOUT=10s
+      - TRIAGE_READ_TIMEOUT=5s
+      - TRIAGE_WRITE_TIMEOUT=10s
+      - TRIAGE_IDLE_TIMEOUT=60s
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s

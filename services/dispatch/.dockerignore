@@ -1,0 +1,37 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Go
+*.mod.orig
+go.sum
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Tests
+*_test.go
+coverage.txt
+*.out
+
+# Binaries
+/bin
+/dist
+triage-server
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Others
+.env
+.env.local
+README.md
+Makefile

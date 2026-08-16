@@ -5,6 +5,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"io"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -13,6 +15,11 @@ import (
 
 	"emergencyops/triage/internal/domain"
 )
+
+// testLogger descarta la salida: en tests solo importa el comportamiento HTTP.
+func testLogger() *slog.Logger {
+	return slog.New(slog.NewTextHandler(io.Discard, nil))
+}
 
 // mockService satisface TriageServiceUseCase sin necesidad de importar
 // el paquete service. Este mock vive SOLO en tests del handler.
@@ -40,7 +47,7 @@ func (m *mockService) GetResult(ctx context.Context, reportID string) (*domain.T
 
 // setupHandler crea un handler con el mock inyectado y un mux listo para usar.
 func setupHandler(mock *mockService) http.Handler {
-	h := NewHTTPHandler(mock)
+	h := NewHTTPHandler(mock, testLogger())
 	mux := http.NewServeMux()
 	h.Register(mux)
 	return mux

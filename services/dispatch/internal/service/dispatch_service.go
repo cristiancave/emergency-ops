@@ -6,9 +6,18 @@ import (
 	"sort"
 	"time"
 
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
+
 	"emergencyops/dispatch/internal/client"
 	"emergencyops/dispatch/internal/domain"
 )
+
+// tracer para spans custom de lógica de negocio (no HTTP/DB, eso lo cubre
+// la auto-instrumentación). Un tracer por paquete es la convención de OTel.
+var tracer = otel.Tracer("emergencyops/dispatch/service")
 
 // TriageClassifier clasifica emergencias llamando a triage-service.
 // Satisfecha por *client.TriageClient en producción y por un mock en tests.
@@ -141,12 +150,28 @@ func (s *DispatchService) findBestAmbulance(
 	ctx context.Context,
 	priority domain.Priority,
 	incidentLocation domain.Location,
-) (*domain.Ambulance, error) {
+) (ambulance *domain.Ambulance, err error) {
+	// Span custom: esta es la lógica de negocio crítica del servicio (a
+	// diferencia de HTTP/DB, que ya vienen instrumentados automáticamente).
+	ctx, span := tracer.Start(ctx, "findBestAmbulance",
+		trace.WithAttributes(
+			attribute.String("dispatch.priority", string(priority)),
+		),
+	)
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+		}
+		span.End()
+	}()
+
 	// Obtener todas las ambulancias disponibles
 	available, err := s.ambulanceRepo.FindAvailable(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch available ambulances: %w", err)
 	}
+	span.SetAttributes(attribute.Int("dispatch.ambulances_available", len(available)))
 
 	// Filtrar: solo las que pueden atender esta prioridad
 	suitable := make([]*domain.Ambulance, 0)
@@ -155,6 +180,7 @@ func (s *DispatchService) findBestAmbulance(
 			suitable = append(suitable, amb)
 		}
 	}
+	span.SetAttributes(attribute.Int("dispatch.ambulances_suitable", len(suitable)))
 
 	if len(suitable) == 0 {
 		return nil, domain.ErrNoAvailableAmbulance
@@ -167,5 +193,6 @@ func (s *DispatchService) findBestAmbulance(
 		return distI < distJ
 	})
 
+	span.SetAttributes(attribute.String("dispatch.selected_ambulance_id", suitable[0].ID))
 	return suitable[0], nil
 }

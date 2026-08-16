@@ -5,6 +5,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"io"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -12,6 +14,11 @@ import (
 
 	"emergencyops/dispatch/internal/domain"
 )
+
+// testLogger descarta la salida: en tests solo importa el comportamiento HTTP.
+func testLogger() *slog.Logger {
+	return slog.New(slog.NewTextHandler(io.Discard, nil))
+}
 
 // mockService satisface DispatchServiceUseCase.
 type mockService struct {
@@ -36,7 +43,7 @@ func (m *mockService) GetDispatch(ctx context.Context, dispatchID string) (*doma
 }
 
 func setupHandler(mock *mockService) http.Handler {
-	h := NewHTTPHandler(mock)
+	h := NewHTTPHandler(mock, testLogger())
 	mux := http.NewServeMux()
 	h.Register(mux)
 	return mux

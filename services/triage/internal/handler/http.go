@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"log"
+	"log/slog"
 	"net/http"
 	"strings"
 	"time"
 
+	"emergencyops/pkg/logger"
 	"emergencyops/triage/internal/domain"
 )
 
@@ -27,11 +28,12 @@ type TriageServiceUseCase interface {
 // HTTPHandler expone el TriageService por HTTP.
 type HTTPHandler struct {
 	svc TriageServiceUseCase
+	log *slog.Logger
 }
 
-// NewHTTPHandler construye el handler con la dependencia inyectada.
-func NewHTTPHandler(svc TriageServiceUseCase) *HTTPHandler {
-	return &HTTPHandler{svc: svc}
+// NewHTTPHandler construye el handler con las dependencias inyectadas.
+func NewHTTPHandler(svc TriageServiceUseCase, log *slog.Logger) *HTTPHandler {
+	return &HTTPHandler{svc: svc, log: log}
 }
 
 // Register registra las rutas del handler en el mux que se le pase.
@@ -96,9 +98,14 @@ func (h *HTTPHandler) classifyEmergency(w http.ResponseWriter, r *http.Request) 
 	// 3. Llamar al service
 	result, err := h.svc.ClassifyEmergency(r.Context(), report)
 	if err != nil {
+		logger.Ctx(r.Context(), h.log).Error("classification failed", "report_id", req.ReportID, "error", err)
 		writeErrorFromDomain(w, err)
 		return
 	}
+
+	logger.Ctx(r.Context(), h.log).Info("emergency classified",
+		"report_id", result.ReportID, "priority", result.Priority.String(),
+	)
 
 	// 4. Mapear entidad → DTO de respuesta y escribir JSON
 	resp := triageResponse{
@@ -116,6 +123,7 @@ func (h *HTTPHandler) getResult(w http.ResponseWriter, r *http.Request) {
 
 	result, err := h.svc.GetResult(r.Context(), reportID)
 	if err != nil {
+		logger.Ctx(r.Context(), h.log).Warn("result lookup failed", "report_id", reportID, "error", err)
 		writeErrorFromDomain(w, err)
 		return
 	}
@@ -145,10 +153,7 @@ func (h *HTTPHandler) health(w http.ResponseWriter, r *http.Request) {
 func writeJSON(w http.ResponseWriter, status int, v any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	if err := json.NewEncoder(w).Encode(v); err != nil {
-		// Ya escribimos el status, poco podemos hacer. Loggeamos y seguimos.
-		log.Printf("error encoding JSON response: %v", err)
-	}
+	_ = json.NewEncoder(w).Encode(v) // si falla acá, la conexión ya está rota
 }
 
 // writeError escribe un error estandarizado con status y código específicos.
@@ -176,8 +181,8 @@ func writeErrorFromDomain(w http.ResponseWriter, err error) {
 		writeError(w, http.StatusBadRequest, err.Error(), "MISSING_ID")
 
 	default:
-		// Error inesperado: loggeamos y devolvemos 500 sin filtrar detalles internos.
-		log.Printf("internal error: %v", err)
+		// Error inesperado: el caller ya lo loggeó con contexto de traza;
+		// acá solo devolvemos 500 sin filtrar detalles internos.
 		writeError(w, http.StatusInternalServerError, "internal server error", "INTERNAL_ERROR")
 	}
 }

@@ -4,20 +4,27 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/XSAM/otelsql"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel/attribute"
 
+	"emergencyops/pkg/logger"
+	"emergencyops/pkg/telemetry"
 	"emergencyops/triage/internal/domain"
 	"emergencyops/triage/internal/handler"
 	"emergencyops/triage/internal/repository"
 	"emergencyops/triage/internal/service"
 )
+
+const serviceName = "triage-service"
+const serviceVersion = "1.0.0"
 
 // config agrupa toda la configuración del servicio.
 // Los valores vienen de variables de entorno con defaults sensatos.
@@ -28,6 +35,8 @@ type config struct {
 	WriteTimeout    time.Duration
 	IdleTimeout     time.Duration
 	DatabaseURL     string // si está vacío, se usa el repositorio en memoria
+	Environment     string
+	OTLPEndpoint    string
 }
 
 // loadConfig lee la configuración del entorno.
@@ -40,6 +49,8 @@ func loadConfig() config {
 		WriteTimeout:    getEnvDuration("TRIAGE_WRITE_TIMEOUT", 10*time.Second),
 		IdleTimeout:     getEnvDuration("TRIAGE_IDLE_TIMEOUT", 60*time.Second),
 		DatabaseURL:     getEnv("DATABASE_URL", ""),
+		Environment:     getEnv("ENVIRONMENT", "dev"),
+		OTLPEndpoint:    getEnv("OTEL_EXPORTER_OTLP_ENDPOINT", "localhost:4317"),
 	}
 }
 
@@ -55,7 +66,6 @@ func getEnvDuration(key string, defaultVal time.Duration) time.Duration {
 		if d, err := time.ParseDuration(v); err == nil {
 			return d
 		}
-		log.Printf("warning: %s=%q no es una duración válida, usando default %v", key, v, defaultVal)
 	}
 	return defaultVal
 }
@@ -65,10 +75,34 @@ func main() {
 	// 1. CONFIGURACIÓN
 	// ==========================================================
 	cfg := loadConfig()
-	log.Printf("triage-service starting with config: port=%s", cfg.Port)
+	log := logger.New(serviceName)
+	log.Info("starting", "port", cfg.Port, "environment", cfg.Environment)
 
 	// ==========================================================
-	// 2. WIRING (composition root)
+	// 2. TELEMETRÍA: trazas OTLP -> Collector, métricas Prometheus
+	// ==========================================================
+	ctx := context.Background()
+	shutdownTelemetry, metricsHandler, err := telemetry.Init(ctx, telemetry.Config{
+		ServiceName:    serviceName,
+		ServiceVersion: serviceVersion,
+		Environment:    cfg.Environment,
+		OTLPEndpoint:   cfg.OTLPEndpoint,
+		OTLPInsecure:   true,
+	})
+	if err != nil {
+		log.Error("failed to initialize telemetry", "error", err)
+		os.Exit(1)
+	}
+	defer func() {
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := shutdownTelemetry(shutdownCtx); err != nil {
+			log.Error("telemetry shutdown failed", "error", err)
+		}
+	}()
+
+	// ==========================================================
+	// 3. WIRING (composition root)
 	// ==========================================================
 	// Este es EL único lugar donde se sabe qué implementación
 	// concreta se usa: si hay DATABASE_URL, Postgres; si no,
@@ -79,42 +113,61 @@ func main() {
 
 	if cfg.DatabaseURL != "" {
 		var err error
-		db, err = sql.Open("pgx", cfg.DatabaseURL)
+		// otelsql.Open envuelve el driver pgx: cada query sale como un span
+		// hijo del handler HTTP que la disparó, con el SQL como atributo.
+		db, err = otelsql.Open("pgx", cfg.DatabaseURL,
+			otelsql.WithAttributes(attribute.String("db.system", "postgresql")),
+		)
 		if err != nil {
-			log.Fatalf("failed to open database: %v", err)
+			log.Error("failed to open database", "error", err)
+			os.Exit(1)
+		}
+
+		if _, err := otelsql.RegisterDBStatsMetrics(db, otelsql.WithAttributes(
+			attribute.String("db.system", "postgresql"),
+		)); err != nil {
+			log.Warn("failed to register DB stats metrics", "error", err)
 		}
 
 		pingCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		if err := repository.PingWithRetry(pingCtx, db, 10, 3*time.Second); err != nil {
 			cancel()
-			log.Fatalf("database not reachable: %v", err)
+			log.Error("database not reachable", "error", err)
+			os.Exit(1)
 		}
 		cancel()
 
 		if err := repository.Migrate(context.Background(), db); err != nil {
-			log.Fatalf("failed to apply migrations: %v", err)
+			log.Error("failed to apply migrations", "error", err)
+			os.Exit(1)
 		}
 
-		log.Println("triage-service using PostgreSQL repository")
+		log.Info("using PostgreSQL repository")
 		repo = repository.NewPostgresRepository(db)
 		defer db.Close()
 	} else {
-		log.Println("triage-service using in-memory repository (DATABASE_URL not set)")
+		log.Info("using in-memory repository (DATABASE_URL not set)")
 		repo = repository.NewMemoryRepository()
 	}
 
 	svc := service.NewTriageService(repo)
-	h := handler.NewHTTPHandler(svc)
+	h := handler.NewHTTPHandler(svc, log)
 
-	mux := http.NewServeMux()
-	h.Register(mux)
+	appMux := http.NewServeMux()
+	h.Register(appMux)
+
+	// Mux raíz: /metrics sin instrumentar (evita spans del scrape de Prometheus),
+	// el resto envuelto con otelhttp para spans de servidor + propagación de contexto.
+	rootMux := http.NewServeMux()
+	rootMux.Handle("/metrics", metricsHandler)
+	rootMux.Handle("/", otelhttp.NewHandler(appMux, serviceName))
 
 	// ==========================================================
-	// 3. RUNTIME: servidor HTTP con timeouts y graceful shutdown
+	// 4. RUNTIME: servidor HTTP con timeouts y graceful shutdown
 	// ==========================================================
 	srv := &http.Server{
 		Addr:         ":" + cfg.Port,
-		Handler:      mux,
+		Handler:      rootMux,
 		ReadTimeout:  cfg.ReadTimeout,
 		WriteTimeout: cfg.WriteTimeout,
 		IdleTimeout:  cfg.IdleTimeout,
@@ -126,7 +179,7 @@ func main() {
 	// Arrancamos el servidor en una goroutine para poder
 	// escuchar señales del sistema operativo en paralelo.
 	go func() {
-		log.Printf("triage-service listening on http://localhost:%s", cfg.Port)
+		log.Info("listening", "addr", "http://localhost:"+cfg.Port)
 		serverErrors <- srv.ListenAndServe()
 	}()
 
@@ -138,26 +191,27 @@ func main() {
 	select {
 	case err := <-serverErrors:
 		if !errors.Is(err, http.ErrServerClosed) {
-			log.Fatalf("server error: %v", err)
+			log.Error("server error", "error", err)
+			os.Exit(1)
 		}
 
 	case sig := <-shutdown:
-		log.Printf("shutdown signal received: %v", sig)
+		log.Info("shutdown signal received", "signal", sig.String())
 
 		// Contexto con timeout para el shutdown: si no termina en X segundos,
 		// forzamos la salida.
-		ctx, cancel := context.WithTimeout(context.Background(), cfg.ShutdownTimeout)
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), cfg.ShutdownTimeout)
 		defer cancel()
 
 		// Shutdown le pide al server que:
 		// - No acepte nuevas conexiones
 		// - Espere a que las conexiones activas terminen
 		// - Retorne cuando todas hayan terminado (o el ctx expire)
-		if err := srv.Shutdown(ctx); err != nil {
-			log.Printf("graceful shutdown failed: %v, forcing close", err)
+		if err := srv.Shutdown(shutdownCtx); err != nil {
+			log.Warn("graceful shutdown failed, forcing close", "error", err)
 			srv.Close()
 		}
 
-		log.Println("triage-service stopped cleanly")
+		log.Info("stopped cleanly")
 	}
 }

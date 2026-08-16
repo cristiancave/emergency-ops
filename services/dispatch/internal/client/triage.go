@@ -8,6 +8,8 @@ import (
 	"io"
 	"net/http"
 	"time"
+
+	"emergencyops/pkg/httpclient"
 )
 
 // TriageResponse es lo que devuelve triage-service en POST /triage.
@@ -37,10 +39,8 @@ type TriageClient struct {
 // baseURL debe ser "http://localhost:8081" (sin trailing slash).
 func NewTriageClient(baseURL string, timeout time.Duration) *TriageClient {
 	return &TriageClient{
-		baseURL: baseURL,
-		httpClient: &http.Client{
-			Timeout: timeout,
-		},
+		baseURL:    baseURL,
+		httpClient: httpclient.New(timeout),
 	}
 }
 

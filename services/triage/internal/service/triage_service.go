@@ -6,8 +6,16 @@ import (
 	"strings"
 	"time"
 
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
+
 	"emergencyops/triage/internal/domain"
 )
+
+// tracer para spans custom de lógica de negocio (no HTTP/DB, eso lo cubre
+// la auto-instrumentación). Un tracer por paquete es la convención de OTel.
+var tracer = otel.Tracer("emergencyops/triage/service")
 
 // Síntomas críticos que disparan prioridad ROJA por sí solos.
 var criticalSymptoms = map[string]bool{
@@ -66,8 +74,21 @@ func (s *TriageService) ClassifyEmergency(ctx context.Context, report *domain.Em
 		return nil, fmt.Errorf("saving report: %w", err)
 	}
 
-	// 3. Aplicar el algoritmo de triage
+	// 3. Aplicar el algoritmo de triage (span custom: es la lógica de
+	// negocio crítica del servicio, a diferencia de HTTP/DB que ya vienen
+	// instrumentados automáticamente).
+	_, span := tracer.Start(ctx, "calculatePriority",
+		trace.WithAttributes(
+			attribute.Int("triage.patient_age", report.PatientAge),
+			attribute.Int("triage.symptom_count", len(report.Symptoms)),
+		),
+	)
 	priority, reason := calculatePriority(report)
+	span.SetAttributes(
+		attribute.String("triage.priority", string(priority)),
+		attribute.String("triage.reason", reason),
+	)
+	span.End()
 
 	result := &domain.TriageResult{
 		ReportID:     report.ID,

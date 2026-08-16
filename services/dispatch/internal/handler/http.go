@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"log"
+	"log/slog"
 	"net/http"
 	"strings"
 	"time"
 
 	"emergencyops/dispatch/internal/domain"
+	"emergencyops/pkg/logger"
 )
 
 // DispatchServiceUseCase define la interfaz que el handler necesita del service.
@@ -29,11 +30,12 @@ type DispatchServiceUseCase interface {
 // HTTPHandler expone DispatchService por HTTP.
 type HTTPHandler struct {
 	svc DispatchServiceUseCase
+	log *slog.Logger
 }
 
-// NewHTTPHandler construye el handler con la dependencia inyectada.
-func NewHTTPHandler(svc DispatchServiceUseCase) *HTTPHandler {
-	return &HTTPHandler{svc: svc}
+// NewHTTPHandler construye el handler con las dependencias inyectadas.
+func NewHTTPHandler(svc DispatchServiceUseCase, log *slog.Logger) *HTTPHandler {
+	return &HTTPHandler{svc: svc, log: log}
 }
 
 // Register registra las rutas en el mux.
@@ -129,9 +131,15 @@ func (h *HTTPHandler) createDispatch(w http.ResponseWriter, r *http.Request) {
 		incidentLocation,
 	)
 	if err != nil {
+		logger.Ctx(r.Context(), h.log).Error("dispatch creation failed", "report_id", req.ReportID, "error", err)
 		writeErrorFromDomain(w, err)
 		return
 	}
+
+	logger.Ctx(r.Context(), h.log).Info("dispatch created",
+		"dispatch_id", dispatch.ID, "report_id", dispatch.ReportID,
+		"priority", string(dispatch.Priority), "ambulance_id", dispatch.AmbulanceID,
+	)
 
 	// 5. Mapear respuesta y escribir
 	resp := dispatchResponse{
@@ -155,6 +163,7 @@ func (h *HTTPHandler) getDispatch(w http.ResponseWriter, r *http.Request) {
 
 	dispatch, err := h.svc.GetDispatch(r.Context(), dispatchID)
 	if err != nil {
+		logger.Ctx(r.Context(), h.log).Warn("dispatch lookup failed", "dispatch_id", dispatchID, "error", err)
 		writeErrorFromDomain(w, err)
 		return
 	}
@@ -189,9 +198,7 @@ func (h *HTTPHandler) health(w http.ResponseWriter, r *http.Request) {
 func writeJSON(w http.ResponseWriter, status int, v any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	if err := json.NewEncoder(w).Encode(v); err != nil {
-		log.Printf("error encoding JSON response: %v", err)
-	}
+	_ = json.NewEncoder(w).Encode(v) // si falla acá, la conexión ya está rota
 }
 
 func writeError(w http.ResponseWriter, status int, msg, code string) {
@@ -218,7 +225,6 @@ func writeErrorFromDomain(w http.ResponseWriter, err error) {
 		writeError(w, http.StatusBadRequest, err.Error(), "INVALID_REQUEST")
 
 	default:
-		log.Printf("internal error: %v", err)
 		writeError(w, http.StatusInternalServerError, "internal server error", "INTERNAL_ERROR")
 	}
 }

@@ -64,10 +64,9 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and push image
-        working-directory: services/${{ matrix.service }}
         env:
           IMAGE_URI: ${{ env.ECR_REGISTRY }}/emergency-ops-${{ matrix.service }}
         run: |
-          docker build -t "$IMAGE_URI:${{ github.sha }}" -t "$IMAGE_URI:latest" .
+          docker build -f services/${{ matrix.service }}/Dockerfile -t "$IMAGE_URI:${{ github.sha }}" -t "$IMAGE_URI:latest" .
           docker push "$IMAGE_URI:${{ github.sha }}"
           docker push "$IMAGE_URI:latest"

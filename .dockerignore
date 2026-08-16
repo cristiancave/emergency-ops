@@ -22,15 +22,16 @@ coverage.txt
 # Binaries
 /bin
 /dist
+dispatch-server
 triage-server
 
 # Docker
-Dockerfile
-.dockerignore
-docker-compose.yml
+**/Dockerfile
+**/.dockerignore
+**/docker-compose.yml
 
 # Others
-.env
-.env.local
-README.md
-Makefile
+**/.env
+**/.env.local
+**/README.md
+**/Makefile

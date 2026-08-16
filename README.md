@@ -1,0 +1,136 @@
+# Emergency Ops
+
+Sistema de despacho de ambulancias con 2 microservicios (`dispatch` → `triage`, dependencia
+HTTP) y acceso a base de datos, instrumentado de punta a punta con OpenTelemetry y desplegado
+en AWS con Terraform + CI/CD.
+
+Este repo contiene el **código de los servicios**. La infraestructura vive en
+[emergency-ops-infrastructure](https://github.com/cristiancave/emergency-ops-infrastructure).
+
+## Arquitectura
+
+```
+                          ┌──────────────┐
+   Internet ──────────────▶     ALB      │
+                          └──────┬───────┘
+                    ┌────────────┼────────────────┐
+                    ▼            ▼                 ▼ :3000
+             /dispatch*     /triage*           Grafana
+                    │            │                 │
+                    ▼            ▼                 │
+          ┌──────────────┐ ┌──────────────┐        │
+          │   dispatch   │─▶│   triage    │        │
+          │  (ECS/Go)    │HTTP│  (ECS/Go) │        │
+          └──────┬───────┘ └──────┬───────┘        │
+                 │  OTLP           │  OTLP           │ scrape
+                 │  (traces)       │  (traces)       │
+                 └────────┬────────┘                │
+                          ▼                          │
+                  ┌───────────────┐                  │
+                  │ OTel Collector│──── X-Ray (traces)
+                  │  (ECS/ADOT)   │
+                  └───────┬───────┘                  │
+                          │ :8888 (self metrics)      │
+                          ▼                          │
+                  ┌───────────────┐   scrape   ┌──────────┐
+                  │  Prometheus   │◀───────────│ dispatch │
+                  │   (ECS)       │◀───────────│ /triage  │
+                  └───────┬───────┘   :8080/8081└──────────┘
+                          └──────────────────────────┘
+                                     │
+                              triage │
+                                     ▼
+                            RDS PostgreSQL
+```
+
+Todo el tráfico interno (Collector, Prometheus, service-to-service metrics scraping) se
+resuelve por DNS privado vía **AWS Cloud Map** (`*.emergency-ops.local`), no por IPs de tarea
+que cambian en cada deploy.
+
+## Los dos servicios
+
+| Servicio | Rol | Persistencia | Puerto |
+|---|---|---|---|
+| `dispatch-service` | Recibe el reporte, clasifica vía `triage`, asigna la ambulancia más cercana | En memoria (fleet de ambulancias) | 8080 |
+| `triage-service` | Clasifica prioridad (`RED`/`YELLOW`/`GREEN`) según síntomas/edad | PostgreSQL (RDS) | 8081 |
+
+## Endpoints (ambiente dev)
+
+Base: `http://emergency-ops-alb-268713301.us-east-1.elb.amazonaws.com`
+
+| Qué | Cómo |
+|---|---|
+| Crear despacho | `POST /dispatch` |
+| Consultar despacho | `GET /dispatch/{id}` |
+| Clasificar emergencia | `POST /triage` |
+| Consultar clasificación | `GET /triage/{report_id}` |
+| Grafana | `:3000` — user `admin`, password: `aws secretsmanager get-secret-value --secret-id emergency-ops-grafana-admin-password --query SecretString --output text` |
+
+No hay HTTPS configurado en dev (solo puerto 80/3000). `/health` de cada servicio no es
+alcanzable vía ALB (sus reglas de path solo enrutan `/dispatch*` y `/triage*`); el healthcheck
+del ALB pega directo al contenedor.
+
+## Observabilidad (las 4 fases)
+
+### Fase 1 — Instrumentación (código, `pkg/`)
+
+- `pkg/telemetry`: `TracerProvider` (OTLP/gRPC → Collector) + `MeterProvider` (Prometheus pull), propagación W3C Trace Context.
+- `pkg/logger`: logs JSON con `trace_id`/`span_id` extraídos del contexto activo.
+- `pkg/httpclient`: cliente HTTP instrumentado (usado por `dispatch` para llamar a `triage`) — así una traza cruza ambos servicios como una sola traza, no dos desconectadas.
+- Auto-instrumentación HTTP (`otelhttp`) en ambos servidores y en el cliente dispatch→triage.
+- Auto-instrumentación DB (`otelsql`) en `triage` — cada query de Postgres es un span hijo, más métricas del pool de conexiones.
+- Spans custom en la lógica de negocio crítica: `findBestAmbulance` (dispatch), `calculatePriority` (triage).
+- `/metrics` en formato Prometheus en ambos servicios.
+
+### Fase 2 — OTel Collector
+
+Desplegado en ECS Fargate con la distribución ADOT (`aws-otel-collector`), config en SSM
+Parameter Store (inyectada como env var, leída con el provider `env:`). Pipeline:
+`receiver OTLP (gRPC+HTTP)` → `processors memory_limiter+resource+batch` → `exporters
+awsxray (trazas) + prometheus (métricas)`.
+
+### Fase 3 — Backends y visualización
+
+- **Trazas**: AWS X-Ray.
+- **Métricas**: Prometheus (self-hosted en ECS) + Grafana, dashboard *"Emergency Ops - SLIs"*
+  con 6 paneles: request rate, error rate %, p99 latency, conexiones DB abiertas (saturación),
+  CPU (vía datasource nativo de CloudWatch), y errores del Collector.
+- **Logs**: JSON estructurado con `trace_id`/`span_id`, enviado a CloudWatch Logs vía el driver
+  `awslogs` de ECS — se correlaciona con trazas usando `trace_id` como pivot.
+
+### Fase 4 — Overhead de la instrumentación
+
+Ver [docs/OTEL_OVERHEAD_BENCHMARK.md](docs/OTEL_OVERHEAD_BENCHMARK.md) para la metodología
+completa. Resumen: con el Collector funcionando (no reintentos fallidos), el overhead es de
+un solo dígito en p99 (~6%) y CPU (~2.5%); unos pocos MiB de memoria en términos absolutos.
+Script de carga en [benchmark/k6-triage-load.js](benchmark/k6-triage-load.js).
+
+## Desarrollo local
+
+```bash
+cd services/triage
+docker compose up -d          # Postgres + triage-service
+cd ../dispatch
+go run ./cmd/server            # usa TRIAGE_SERVICE_URL=http://localhost:8081 por default
+```
+
+Sin `DATABASE_URL`, `triage` cae automáticamente al repositorio en memoria — no hace falta
+Postgres para desarrollar o correr tests.
+
+## CI/CD
+
+Push a `main` en este repo dispara (`.github/workflows/build-push.yml`):
+1. `go test ./...` en ambos servicios.
+2. Build + push de las imágenes Docker a ECR (contexto = raíz del repo, porque ambos servicios
+   dependen del módulo local `emergencyops/pkg` vía `go.work`).
+
+Push a `main` en `emergency-ops-infrastructure` dispara `terraform plan` + `apply` contra el
+ambiente `dev`. Autenticación AWS vía OIDC (IAM Role, sin access keys estáticas en GitHub).
+
+## Limitaciones conocidas (no bloqueantes)
+
+- `dispatch` no libera ambulancias tras el ETA — bajo carga sostenida el pool se agota (visible
+  en el benchmark de Fase 4, que por eso mide contra `triage`).
+- `incident_latitude`/`incident_longitude` a veces devuelven `0` en la respuesta de
+  `POST /dispatch` — posible mismatch de nombre de campo en el DTO, sin investigar a fondo.
+- Sin HTTPS ni WAF en el ALB (aceptable para `dev`, no para producción).

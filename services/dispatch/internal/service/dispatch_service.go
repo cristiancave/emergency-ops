@@ -10,13 +10,19 @@ import (
 	"emergencyops/dispatch/internal/domain"
 )
 
+// TriageClassifier clasifica emergencias llamando a triage-service.
+// Satisfecha por *client.TriageClient en producción y por un mock en tests.
+type TriageClassifier interface {
+	Classify(ctx context.Context, req client.TriageRequest) (*client.TriageResponse, error)
+}
+
 // DispatchService orquesta el despacho de ambulancias.
 // Depende de:
-//  - TriageClient: para clasificar emergencias
+//  - TriageClassifier: para clasificar emergencias
 //  - AmbulanceRepository: para acceder a la flota
 //  - DispatchRepository: para persistir despachos
 type DispatchService struct {
-	triageClient      *client.TriageClient
+	triageClient      TriageClassifier
 	ambulanceRepo     domain.AmbulanceRepository
 	dispatchRepo      domain.DispatchRepository
 	now               func() time.Time
@@ -25,7 +31,7 @@ type DispatchService struct {
 
 // NewDispatchService construye el service con todas sus dependencias.
 func NewDispatchService(
-	triageClient *client.TriageClient,
+	triageClient TriageClassifier,
 	ambulanceRepo domain.AmbulanceRepository,
 	dispatchRepo domain.DispatchRepository,
 ) *DispatchService {

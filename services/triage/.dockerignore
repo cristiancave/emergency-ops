@@ -5,7 +5,6 @@
 
 # Go
 *.mod.orig
-go.sum
 
 # IDE
 .vscode

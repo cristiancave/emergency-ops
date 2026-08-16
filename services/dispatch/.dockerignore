@@ -5,7 +5,6 @@
 
 # Go
 *.mod.orig
-go.sum
 
 # IDE
 .vscode
@@ -23,7 +22,7 @@ coverage.txt
 # Binaries
 /bin
 /dist
-triage-server
+dispatch-server
 
 # Docker
 Dockerfile

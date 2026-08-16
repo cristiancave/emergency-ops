@@ -12,6 +12,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/exporters/prometheus"
 	"go.opentelemetry.io/otel/propagation"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
@@ -33,6 +34,13 @@ type Config struct {
 	// OTLPInsecure desactiva TLS en la conexión gRPC al Collector.
 	// true por default: el Collector vive dentro de la misma red privada.
 	OTLPInsecure bool
+
+	// GCPOTLPEndpoint es el host (sin esquema, ej. "servicio-xxxx-uc.a.run.app")
+	// del OTel Collector en Cloud Run. Opcional: si está vacío, no se exporta
+	// ahí. Usa OTLP/HTTP con TLS (no gRPC): es la segunda pata "cross-cloud"
+	// para demostrar propagación de contexto con el Collector de GCP, además
+	// del de AWS. Ver terraform-gcp/collector.tf.
+	GCPOTLPEndpoint string
 }
 
 // Shutdown libera los recursos de telemetría (flush de spans pendientes, etc).
@@ -117,10 +125,27 @@ func buildTracerProvider(ctx context.Context, cfg Config, res *resource.Resource
 		return nil, fmt.Errorf("create OTLP trace exporter: %w", err)
 	}
 
-	return sdktrace.NewTracerProvider(
+	tpOpts := []sdktrace.TracerProviderOption{
 		sdktrace.WithBatcher(exporter),
 		sdktrace.WithResource(res),
-	), nil
+	}
+
+	// Segundo exporter opcional: manda cada span también al Collector de
+	// GCP (Cloud Run), en paralelo al de AWS. Un TracerProvider con más de
+	// un WithBatcher despacha el mismo span a todos los batchers
+	// registrados, no hace falta duplicar spans a mano.
+	if cfg.GCPOTLPEndpoint != "" {
+		gcpExporter, err := otlptracehttp.New(ctx,
+			otlptracehttp.WithEndpoint(cfg.GCPOTLPEndpoint),
+			otlptracehttp.WithTimeout(5*time.Second),
+		)
+		if err != nil {
+			return nil, fmt.Errorf("create GCP OTLP trace exporter: %w", err)
+		}
+		tpOpts = append(tpOpts, sdktrace.WithBatcher(gcpExporter))
+	}
+
+	return sdktrace.NewTracerProvider(tpOpts...), nil
 }
 
 func buildMeterProvider(res *resource.Resource) (*sdkmetric.MeterProvider, *prometheus.Exporter, error) {

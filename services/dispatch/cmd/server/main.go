@@ -32,6 +32,7 @@ type config struct {
 	IdleTimeout         time.Duration
 	Environment         string
 	OTLPEndpoint        string
+	GCPOTLPEndpoint     string
 }
 
 func loadConfig() config {
@@ -45,6 +46,7 @@ func loadConfig() config {
 		IdleTimeout:         getEnvDuration("DISPATCH_IDLE_TIMEOUT", 60*time.Second),
 		Environment:         getEnv("ENVIRONMENT", "dev"),
 		OTLPEndpoint:        getEnv("OTEL_EXPORTER_OTLP_ENDPOINT", "localhost:4317"),
+		GCPOTLPEndpoint:     getEnv("OTEL_EXPORTER_OTLP_ENDPOINT_GCP", ""),
 	}
 }
 
@@ -77,11 +79,12 @@ func main() {
 	// ==========================================================
 	ctx := context.Background()
 	shutdownTelemetry, metricsHandler, err := telemetry.Init(ctx, telemetry.Config{
-		ServiceName:    serviceName,
-		ServiceVersion: serviceVersion,
-		Environment:    cfg.Environment,
-		OTLPEndpoint:   cfg.OTLPEndpoint,
-		OTLPInsecure:   true,
+		ServiceName:     serviceName,
+		ServiceVersion:  serviceVersion,
+		Environment:     cfg.Environment,
+		OTLPEndpoint:    cfg.OTLPEndpoint,
+		OTLPInsecure:    true,
+		GCPOTLPEndpoint: cfg.GCPOTLPEndpoint,
 	})
 	if err != nil {
 		log.Error("failed to initialize telemetry", "error", err)

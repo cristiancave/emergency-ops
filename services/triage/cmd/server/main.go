@@ -37,6 +37,7 @@ type config struct {
 	DatabaseURL     string // si está vacío, se usa el repositorio en memoria
 	Environment     string
 	OTLPEndpoint    string
+	GCPOTLPEndpoint string
 }
 
 // loadConfig lee la configuración del entorno.
@@ -51,6 +52,7 @@ func loadConfig() config {
 		DatabaseURL:     getEnv("DATABASE_URL", ""),
 		Environment:     getEnv("ENVIRONMENT", "dev"),
 		OTLPEndpoint:    getEnv("OTEL_EXPORTER_OTLP_ENDPOINT", "localhost:4317"),
+		GCPOTLPEndpoint: getEnv("OTEL_EXPORTER_OTLP_ENDPOINT_GCP", ""),
 	}
 }
 
@@ -83,11 +85,12 @@ func main() {
 	// ==========================================================
 	ctx := context.Background()
 	shutdownTelemetry, metricsHandler, err := telemetry.Init(ctx, telemetry.Config{
-		ServiceName:    serviceName,
-		ServiceVersion: serviceVersion,
-		Environment:    cfg.Environment,
-		OTLPEndpoint:   cfg.OTLPEndpoint,
-		OTLPInsecure:   true,
+		ServiceName:     serviceName,
+		ServiceVersion:  serviceVersion,
+		Environment:     cfg.Environment,
+		OTLPEndpoint:    cfg.OTLPEndpoint,
+		OTLPInsecure:    true,
+		GCPOTLPEndpoint: cfg.GCPOTLPEndpoint,
 	})
 	if err != nil {
 		log.Error("failed to initialize telemetry", "error", err)

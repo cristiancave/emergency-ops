@@ -70,6 +70,21 @@ No hay HTTPS configurado en dev (solo puerto 80/3000). `/health` de cada servici
 alcanzable vía ALB (sus reglas de path solo enrutan `/dispatch*` y `/triage*`); el healthcheck
 del ALB pega directo al contenedor.
 
+Ejemplo de `POST /dispatch` — **ojo**: `incident_latitude`/`incident_longitude` son campos
+**planos** en el nivel raíz del JSON, no un objeto anidado (ver "Limitaciones conocidas" más
+abajo, un error justamente en este punto quedó documentado ahí):
+
+```json
+{
+  "report_id": "RPT-1",
+  "patient_age": 45,
+  "symptoms": ["dolor torácico"],
+  "description": "texto libre",
+  "incident_latitude": 40.4168,
+  "incident_longitude": -3.7038
+}
+```
+
 ## Observabilidad (las 4 fases)
 
 ### Fase 1 — Instrumentación (código, `pkg/`)
@@ -105,6 +120,22 @@ completa. Resumen: con el Collector funcionando (no reintentos fallidos), el ove
 un solo dígito en p99 (~6%) y CPU (~2.5%); unos pocos MiB de memoria en términos absolutos.
 Script de carga en [benchmark/k6-triage-load.js](benchmark/k6-triage-load.js).
 
+## Probar el sistema desplegado / ver los datos en vivo
+
+- **Generar tráfico de prueba** (mezcla de requests válidas e inválidas, para que los
+  dashboards no muestren solo el camino feliz):
+  [`emergency-ops-infrastructure/scripts/generate-demo-traffic.ps1`](https://github.com/cristiancave/emergency-ops-infrastructure/blob/main/scripts/generate-demo-traffic.ps1)
+- **Grafana**: ver tabla de endpoints arriba.
+- **Trazas**: consola de X-Ray →
+  `https://console.aws.amazon.com/xray/home?region=us-east-1#/traces` (ajustá el rango de
+  tiempo arriba a la derecha).
+- **Logs correlacionados**: CloudWatch Logs Insights sobre `/ecs/emergency-ops-dispatch` o
+  `/ecs/emergency-ops-triage`, buscando por el campo `trace_id` para pivotear a la traza
+  correspondiente en X-Ray.
+- **Operar el ambiente en AWS** (pausar/reanudar servicios para no generar costo, conectarse a
+  la RDS sin exponerla, destruir infra): ver el README de
+  [emergency-ops-infrastructure](https://github.com/cristiancave/emergency-ops-infrastructure).
+
 ## Desarrollo local
 
 ```bash
@@ -126,6 +157,13 @@ Push a `main` en este repo dispara (`.github/workflows/build-push.yml`):
 
 Push a `main` en `emergency-ops-infrastructure` dispara `terraform plan` + `apply` contra el
 ambiente `dev`. Autenticación AWS vía OIDC (IAM Role, sin access keys estáticas en GitHub).
+
+## Documentación adicional
+
+- [Diagrama de arquitectura](https://github.com/cristiancave/emergency-ops-infrastructure/blob/main/docs/architecture.drawio)
+  (`.drawio`, abrir en [app.diagrams.net](https://app.diagrams.net))
+- [Reporte técnico completo](https://github.com/cristiancave/emergency-ops-infrastructure/blob/main/docs/Reporte_Tecnico_Emergency_Ops.docx)
+  (arquitectura, decisiones de diseño, análisis de overhead)
 
 ## Limitaciones conocidas (no bloqueantes)
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"log"
 	"net/http"
@@ -10,6 +11,9 @@ import (
 	"syscall"
 	"time"
 
+	_ "github.com/jackc/pgx/v5/stdlib"
+
+	"emergencyops/triage/internal/domain"
 	"emergencyops/triage/internal/handler"
 	"emergencyops/triage/internal/repository"
 	"emergencyops/triage/internal/service"
@@ -23,6 +27,7 @@ type config struct {
 	ReadTimeout     time.Duration
 	WriteTimeout    time.Duration
 	IdleTimeout     time.Duration
+	DatabaseURL     string // si está vacío, se usa el repositorio en memoria
 }
 
 // loadConfig lee la configuración del entorno.
@@ -34,6 +39,7 @@ func loadConfig() config {
 		ReadTimeout:     getEnvDuration("TRIAGE_READ_TIMEOUT", 5*time.Second),
 		WriteTimeout:    getEnvDuration("TRIAGE_WRITE_TIMEOUT", 10*time.Second),
 		IdleTimeout:     getEnvDuration("TRIAGE_IDLE_TIMEOUT", 60*time.Second),
+		DatabaseURL:     getEnv("DATABASE_URL", ""),
 	}
 }
 
@@ -65,10 +71,38 @@ func main() {
 	// 2. WIRING (composition root)
 	// ==========================================================
 	// Este es EL único lugar donde se sabe qué implementación
-	// concreta se usa. Cambiar aquí de MemoryRepository a
-	// PostgresRepository sería una línea.
+	// concreta se usa: si hay DATABASE_URL, Postgres; si no,
+	// memoria (útil para desarrollo local y tests rápidos).
 
-	repo := repository.NewMemoryRepository()
+	var repo domain.TriageRepository
+	var db *sql.DB
+
+	if cfg.DatabaseURL != "" {
+		var err error
+		db, err = sql.Open("pgx", cfg.DatabaseURL)
+		if err != nil {
+			log.Fatalf("failed to open database: %v", err)
+		}
+
+		pingCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		if err := repository.PingWithRetry(pingCtx, db, 10, 3*time.Second); err != nil {
+			cancel()
+			log.Fatalf("database not reachable: %v", err)
+		}
+		cancel()
+
+		if err := repository.Migrate(context.Background(), db); err != nil {
+			log.Fatalf("failed to apply migrations: %v", err)
+		}
+
+		log.Println("triage-service using PostgreSQL repository")
+		repo = repository.NewPostgresRepository(db)
+		defer db.Close()
+	} else {
+		log.Println("triage-service using in-memory repository (DATABASE_URL not set)")
+		repo = repository.NewMemoryRepository()
+	}
+
 	svc := service.NewTriageService(repo)
 	h := handler.NewHTTPHandler(svc)
 

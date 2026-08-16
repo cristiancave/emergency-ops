@@ -1,6 +1,23 @@
 version: '3.8'
 
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: triage-postgres
+    environment:
+      - POSTGRES_USER=triage
+      - POSTGRES_PASSWORD=devpass
+      - POSTGRES_DB=triage
+    ports:
+      - "5432:5432"
+    volumes:
+      - triage-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U triage"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
   triage:
     build:
       context: .
@@ -14,6 +31,10 @@ services:
       - TRIAGE_READ_TIMEOUT=5s
       - TRIAGE_WRITE_TIMEOUT=10s
       - TRIAGE_IDLE_TIMEOUT=60s
+      - DATABASE_URL=postgres://triage:devpass@postgres:5432/triage?sslmode=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/health"]
@@ -21,3 +42,6 @@ services:
       timeout: 3s
       retries: 3
       start_period: 5s
+
+volumes:
+  triage-postgres-data:

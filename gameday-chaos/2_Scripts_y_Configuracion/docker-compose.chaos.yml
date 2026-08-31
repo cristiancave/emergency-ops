@@ -1,0 +1,108 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: chaos-postgres
+    environment:
+      - POSTGRES_USER=triage
+      - POSTGRES_PASSWORD=devpass
+      - POSTGRES_DB=triage
+    ports:
+      - "5432:5432"
+    volumes:
+      - chaos-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U triage"]
+      interval: 3s
+      timeout: 2s
+      retries: 5
+    networks:
+      - chaos-net
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.157.0
+    container_name: chaos-otel-collector
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "4317:4317" # OTLP gRPC
+      - "4318:4318" # OTLP HTTP
+      - "8889:8889" # Prometheus exporter
+    networks:
+      - chaos-net
+
+  triage:
+    image: triage-service:latest
+    container_name: chaos-triage
+    ports:
+      - "8081:8081"
+    environment:
+      - TRIAGE_PORT=8081
+      - TRIAGE_SHUTDOWN_TIMEOUT=10s
+      - TRIAGE_READ_TIMEOUT=5s
+      - TRIAGE_WRITE_TIMEOUT=10s
+      - TRIAGE_IDLE_TIMEOUT=60s
+      - DATABASE_URL=postgres://triage:devpass@postgres:5432/triage?sslmode=disable
+      - ENVIRONMENT=chaos-sandbox
+      - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317
+    depends_on:
+      postgres:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    networks:
+      - chaos-net
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 3s
+
+  toxiproxy:
+    image: ghcr.io/shopify/toxiproxy:2.9.0
+    container_name: chaos-toxiproxy
+    ports:
+      - "8474:8474" # Toxiproxy API
+      - "8082:8082" # Proxy to triage:8081
+    networks:
+      - chaos-net
+    depends_on:
+      - triage
+
+  dispatch:
+    image: dispatch-service:latest
+    container_name: chaos-dispatch
+    ports:
+      - "8080:8080"
+    environment:
+      - DISPATCH_PORT=8080
+      - TRIAGE_SERVICE_URL=http://toxiproxy:8082
+      - TRIAGE_CLIENT_TIMEOUT=5s
+      - DISPATCH_SHUTDOWN_TIMEOUT=10s
+      - DISPATCH_READ_TIMEOUT=5s
+      - DISPATCH_WRITE_TIMEOUT=10s
+      - DISPATCH_IDLE_TIMEOUT=60s
+      - ENVIRONMENT=chaos-sandbox
+      - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317
+    depends_on:
+      - triage
+      - toxiproxy
+      - otel-collector
+    networks:
+      - chaos-net
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 3s
+
+volumes:
+  chaos-postgres-data:
+
+networks:
+  chaos-net:
+    driver: bridge

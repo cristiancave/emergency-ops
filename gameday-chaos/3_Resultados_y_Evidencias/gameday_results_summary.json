@@ -1,0 +1,272 @@
+{
+  "experiment_id": "EXP-01-CHAOS-GAME-DAY",
+  "service": "Emergency Ops (triage-service & dispatch-service)",
+  "injected_fault": "Network Latency 850ms (\u00b1150ms jitter) via Toxiproxy/tc simulation",
+  "mttr_seconds": 1.005267858505249,
+  "metrics": {
+    "baseline": {
+      "phase": "1. Estado Estable (Baseline)",
+      "total_requests": 60,
+      "successful_requests": 60,
+      "failed_requests": 0,
+      "error_rate_pct": 0.0,
+      "total_duration_sec": 0.4315967559814453,
+      "throughput_req_sec": 139.0186537977117,
+      "latency_avg_ms": 40.49693743387858,
+      "latency_min_ms": 16.72649383544922,
+      "latency_max_ms": 78.71651649475098,
+      "latency_p50_ms": 42.41752624511719,
+      "latency_p90_ms": 67.03901290893555,
+      "latency_p95_ms": 74.0504264831543,
+      "latency_p99_ms": 78.71651649475098,
+      "samples": [
+        {
+          "index": 1,
+          "report_id": "RPT-BASE-0001-4f1254",
+          "status_code": 201,
+          "duration_ms": 25.32815933227539,
+          "success": true,
+          "error": null,
+          "response": {
+            "report_id": "RPT-BASE-0001-4f1254",
+            "priority": "YELLOW",
+            "reason": "s\u00edntoma urgente: fiebre alta",
+            "classified_at": "2026-08-28T03:30:51.679361047Z"
+          }
+        },
+        {
+          "index": 2,
+          "report_id": "RPT-BASE-0002-147fa8",
+          "status_code": 201,
+          "duration_ms": 25.345325469970703,
+          "success": true,
+          "error": null,
+          "response": {
+            "report_id": "RPT-BASE-0002-147fa8",
+            "priority": "YELLOW",
+            "reason": "s\u00edntoma urgente: fiebre alta",
+            "classified_at": "2026-08-28T03:30:51.676600026Z"
+          }
+        },
+        {
+          "index": 6,
+          "report_id": "RPT-BASE-0006-87542d",
+          "status_code": 201,
+          "duration_ms": 24.968624114990234,
+          "success": true,
+          "error": null,
+          "response": {
+            "report_id": "RPT-BASE-0006-87542d",
+            "priority": "GREEN",
+            "reason": "sin s\u00edntomas de alarma detectados",
+            "classified_at": "2026-08-28T03:30:51.687129349Z"
+          }
+        },
+        {
+          "index": 3,
+          "report_id": "RPT-BASE-0003-da029f",
+          "status_code": 201,
+          "duration_ms": 38.54179382324219,
+          "success": true,
+          "error": null,
+          "response": {
+            "report_id": "RPT-BASE-0003-da029f",
+            "priority": "GREEN",
+            "reason": "sin s\u00edntomas de alarma detectados",
+            "classified_at": "2026-08-28T03:30:51.695867663Z"
+          }
+        },
+        {
+          "index": 4,
+          "report_id": "RPT-BASE-0004-4d884c",
+          "status_code": 201,
+          "duration_ms": 42.41752624511719,
+          "success": true,
+          "error": null,
+          "response": {
+            "report_id": "RPT-BASE-0004-4d884c",
+            "priority": "YELLOW",
+            "reason": "s\u00edntoma urgente: fiebre alta",
+            "classified_at": "2026-08-28T03:30:51.697454547Z"
+          }
+        }
+      ]
+    },
+    "chaos": {
+      "phase": "2. Inyecci\u00f3n de Caos (Latencia + Jitter)",
+      "total_requests": 60,
+      "successful_requests": 60,
+      "failed_requests": 0,
+      "error_rate_pct": 0.0,
+      "total_duration_sec": 9.070250272750854,
+      "throughput_req_sec": 6.615032462803588,
+      "latency_avg_ms": 858.6382428805033,
+      "latency_min_ms": 716.8073654174805,
+      "latency_max_ms": 1025.2432823181152,
+      "latency_p50_ms": 858.7086200714111,
+      "latency_p90_ms": 1001.0161399841309,
+      "latency_p95_ms": 1015.9237384796143,
+      "latency_p99_ms": 1025.2432823181152,
+      "samples": [
+        {
+          "index": 3,
+          "report_id": "RPT-CHAOS-0003-456e5a",
+          "status_code": 201,
+          "duration_ms": 717.548131942749,
+          "success": true,
+          "error": null,
+          "response": {
+            "report_id": "RPT-CHAOS-0003-456e5a",
+            "priority": "GREEN",
+            "reason": "sin s\u00edntomas de alarma detectados",
+            "classified_at": "2026-08-28T03:30:54.815990089Z"
+          }
+        },
+        {
+          "index": 1,
+          "report_id": "RPT-CHAOS-0001-934dcb",
+          "status_code": 201,
+          "duration_ms": 755.8021545410156,
+          "success": true,
+          "error": null,
+          "response": {
+            "report_id": "RPT-CHAOS-0001-934dcb",
+            "priority": "YELLOW",
+            "reason": "s\u00edntoma urgente: fiebre alta",
+            "classified_at": "2026-08-28T03:30:54.854051451Z"
+          }
+        },
+        {
+          "index": 4,
+          "report_id": "RPT-CHAOS-0004-7d5f86",
+          "status_code": 201,
+          "duration_ms": 795.2251434326172,
+          "success": true,
+          "error": null,
+          "response": {
+            "report_id": "RPT-CHAOS-0004-7d5f86",
+            "priority": "YELLOW",
+            "reason": "s\u00edntoma urgente: fiebre alta",
+            "classified_at": "2026-08-28T03:30:54.896474613Z"
+          }
+        },
+        {
+          "index": 6,
+          "report_id": "RPT-CHAOS-0006-b19c6b",
+          "status_code": 201,
+          "duration_ms": 801.6784191131592,
+          "success": true,
+          "error": null,
+          "response": {
+            "report_id": "RPT-CHAOS-0006-b19c6b",
+            "priority": "GREEN",
+            "reason": "sin s\u00edntomas de alarma detectados",
+            "classified_at": "2026-08-28T03:30:54.905595359Z"
+          }
+        },
+        {
+          "index": 2,
+          "report_id": "RPT-CHAOS-0002-2920dd",
+          "status_code": 201,
+          "duration_ms": 835.2606296539307,
+          "success": true,
+          "error": null,
+          "response": {
+            "report_id": "RPT-CHAOS-0002-2920dd",
+            "priority": "YELLOW",
+            "reason": "s\u00edntoma urgente: fiebre alta",
+            "classified_at": "2026-08-28T03:30:54.934735099Z"
+          }
+        }
+      ]
+    },
+    "recovery": {
+      "phase": "3. Estado Post-Rollback (Recuperado)",
+      "total_requests": 60,
+      "successful_requests": 60,
+      "failed_requests": 0,
+      "error_rate_pct": 0.0,
+      "total_duration_sec": 0.313525915145874,
+      "throughput_req_sec": 191.37174026613982,
+      "latency_avg_ms": 29.2318860689799,
+      "latency_min_ms": 13.713359832763672,
+      "latency_max_ms": 63.56000900268555,
+      "latency_p50_ms": 24.085521697998047,
+      "latency_p90_ms": 47.18804359436035,
+      "latency_p95_ms": 51.579952239990234,
+      "latency_p99_ms": 63.56000900268555,
+      "samples": [
+        {
+          "index": 1,
+          "report_id": "RPT-REC-0001-5ccb5d",
+          "status_code": 201,
+          "duration_ms": 17.212867736816406,
+          "success": true,
+          "error": null,
+          "response": {
+            "report_id": "RPT-REC-0001-5ccb5d",
+            "priority": "YELLOW",
+            "reason": "s\u00edntoma urgente: fiebre alta",
+            "classified_at": "2026-08-28T03:31:04.186173204Z"
+          }
+        },
+        {
+          "index": 2,
+          "report_id": "RPT-REC-0002-526212",
+          "status_code": 201,
+          "duration_ms": 17.840147018432617,
+          "success": true,
+          "error": null,
+          "response": {
+            "report_id": "RPT-REC-0002-526212",
+            "priority": "YELLOW",
+            "reason": "s\u00edntoma urgente: fiebre alta",
+            "classified_at": "2026-08-28T03:31:04.187742472Z"
+          }
+        },
+        {
+          "index": 4,
+          "report_id": "RPT-REC-0004-553610",
+          "status_code": 201,
+          "duration_ms": 23.167133331298828,
+          "success": true,
+          "error": null,
+          "response": {
+            "report_id": "RPT-REC-0004-553610",
+            "priority": "YELLOW",
+            "reason": "s\u00edntoma urgente: fiebre alta",
+            "classified_at": "2026-08-28T03:31:04.196575115Z"
+          }
+        },
+        {
+          "index": 6,
+          "report_id": "RPT-REC-0006-afd366",
+          "status_code": 201,
+          "duration_ms": 23.311614990234375,
+          "success": true,
+          "error": null,
+          "response": {
+            "report_id": "RPT-REC-0006-afd366",
+            "priority": "GREEN",
+            "reason": "sin s\u00edntomas de alarma detectados",
+            "classified_at": "2026-08-28T03:31:04.198438314Z"
+          }
+        },
+        {
+          "index": 3,
+          "report_id": "RPT-REC-0003-ad47e3",
+          "status_code": 201,
+          "duration_ms": 33.052682876586914,
+          "success": true,
+          "error": null,
+          "response": {
+            "report_id": "RPT-REC-0003-ad47e3",
+            "priority": "GREEN",
+            "reason": "sin s\u00edntomas de alarma detectados",
+            "classified_at": "2026-08-28T03:31:04.206461371Z"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,1271 @@
+{
+  "experiment_id": "EXP-CHAOS-01-NET-LATENCY",
+  "date": "2026-08-28",
+  "system": "Emergency Ops (dispatch-service -> triage-service)",
+  "recovery_time_sec": 1.0050218105316162,
+  "baseline": {
+    "phase": "1. Estado Estable (Baseline)",
+    "total_requests": 50,
+    "successful_requests": 1,
+    "failed_requests": 49,
+    "error_rate_pct": 98.0,
+    "total_duration_sec": 0.3168187141418457,
+    "throughput_req_sec": 157.81896008079264,
+    "latency_avg_ms": 29.793071746826172,
+    "latency_min_ms": 13.913393020629883,
+    "latency_max_ms": 64.10503387451172,
+    "latency_p50_ms": 24.534940719604492,
+    "latency_p90_ms": 49.90863800048828,
+    "latency_p95_ms": 57.97123908996582,
+    "latency_p99_ms": 64.10503387451172,
+    "raw_results": [
+      {
+        "index": 3,
+        "status_code": 201,
+        "duration_ms": 27.74524688720703,
+        "success": true,
+        "error": null,
+        "response": {
+          "dispatch_id": "DSP-1787887606",
+          "report_id": "RPT-CHAOS-0003",
+          "ambulance_id": "AMB-001",
+          "priority": "GREEN",
+          "incident_latitude": 40.4198,
+          "incident_longitude": -3.7008,
+          "ambulance_latitude": 4.711,
+          "ambulance_longitude": -74.0721,
+          "estimated_arrival_minutes": 9615,
+          "created_at": "2026-08-28T03:26:46.249637238Z"
+        }
+      },
+      {
+        "index": 1,
+        "status_code": 500,
+        "duration_ms": 42.48309135437012,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 4,
+        "status_code": 500,
+        "duration_ms": 40.74454307556152,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 6,
+        "status_code": 500,
+        "duration_ms": 17.949581146240234,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 5,
+        "status_code": 500,
+        "duration_ms": 44.21043395996094,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 2,
+        "status_code": 500,
+        "duration_ms": 49.90863800048828,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 7,
+        "status_code": 500,
+        "duration_ms": 22.669553756713867,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 9,
+        "status_code": 500,
+        "duration_ms": 19.13619041442871,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 8,
+        "status_code": 500,
+        "duration_ms": 30.250072479248047,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 12,
+        "status_code": 500,
+        "duration_ms": 15.93637466430664,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 13,
+        "status_code": 500,
+        "duration_ms": 16.082286834716797,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 11,
+        "status_code": 500,
+        "duration_ms": 38.07973861694336,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 10,
+        "status_code": 500,
+        "duration_ms": 42.395591735839844,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 15,
+        "status_code": 500,
+        "duration_ms": 21.73137664794922,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 16,
+        "status_code": 500,
+        "duration_ms": 23.023366928100586,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 18,
+        "status_code": 500,
+        "duration_ms": 23.494720458984375,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 17,
+        "status_code": 500,
+        "duration_ms": 31.451702117919922,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 20,
+        "status_code": 500,
+        "duration_ms": 20.715951919555664,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 21,
+        "status_code": 500,
+        "duration_ms": 20.856618881225586,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 14,
+        "status_code": 500,
+        "duration_ms": 62.80064582824707,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 19,
+        "status_code": 500,
+        "duration_ms": 38.44118118286133,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 22,
+        "status_code": 500,
+        "duration_ms": 22.040605545043945,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 23,
+        "status_code": 500,
+        "duration_ms": 23.07438850402832,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 24,
+        "status_code": 500,
+        "duration_ms": 22.63951301574707,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 26,
+        "status_code": 500,
+        "duration_ms": 20.92885971069336,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 27,
+        "status_code": 500,
+        "duration_ms": 35.20607948303223,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 30,
+        "status_code": 500,
+        "duration_ms": 25.2988338470459,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 31,
+        "status_code": 500,
+        "duration_ms": 17.972230911254883,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 25,
+        "status_code": 500,
+        "duration_ms": 64.10503387451172,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 32,
+        "status_code": 500,
+        "duration_ms": 13.913393020629883,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 28,
+        "status_code": 500,
+        "duration_ms": 57.97123908996582,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 29,
+        "status_code": 500,
+        "duration_ms": 52.33955383300781,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 33,
+        "status_code": 500,
+        "duration_ms": 28.7933349609375,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 35,
+        "status_code": 500,
+        "duration_ms": 27.439594268798828,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 36,
+        "status_code": 500,
+        "duration_ms": 26.73625946044922,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 38,
+        "status_code": 500,
+        "duration_ms": 19.720077514648438,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 39,
+        "status_code": 500,
+        "duration_ms": 15.412092208862305,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 34,
+        "status_code": 500,
+        "duration_ms": 48.13981056213379,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 40,
+        "status_code": 500,
+        "duration_ms": 19.565343856811523,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 37,
+        "status_code": 500,
+        "duration_ms": 46.97012901306152,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 41,
+        "status_code": 500,
+        "duration_ms": 17.115354537963867,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 42,
+        "status_code": 500,
+        "duration_ms": 21.014690399169922,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 43,
+        "status_code": 500,
+        "duration_ms": 20.313262939453125,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 45,
+        "status_code": 500,
+        "duration_ms": 23.138046264648438,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 46,
+        "status_code": 500,
+        "duration_ms": 24.534940719604492,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 44,
+        "status_code": 500,
+        "duration_ms": 36.46063804626465,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 49,
+        "status_code": 500,
+        "duration_ms": 17.02427864074707,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 50,
+        "status_code": 500,
+        "duration_ms": 16.431570053100586,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 48,
+        "status_code": 500,
+        "duration_ms": 33.27012062072754,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 47,
+        "status_code": 500,
+        "duration_ms": 41.9774055480957,
+        "success": false,
+        "error": "{\"error\":\"internal server error\",\"code\":\"INTERNAL_ERROR\"}\n",
+        "response": null
+      }
+    ]
+  },
+  "chaos": {
+    "phase": "2. Estado en Caos (Latencia + Jitter)",
+    "total_requests": 50,
+    "successful_requests": 0,
+    "failed_requests": 50,
+    "error_rate_pct": 100.0,
+    "total_duration_sec": 11.816923141479492,
+    "throughput_req_sec": 4.231219870127711,
+    "latency_avg_ms": 1162.6812028884888,
+    "latency_min_ms": 869.3242073059082,
+    "latency_max_ms": 1350.3944873809814,
+    "latency_p50_ms": 1193.5193538665771,
+    "latency_p90_ms": 1332.951545715332,
+    "latency_p95_ms": 1348.4036922454834,
+    "latency_p99_ms": 1350.3944873809814,
+    "raw_results": [
+      {
+        "index": 3,
+        "status_code": 502,
+        "duration_ms": 901.3528823852539,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 5,
+        "status_code": 502,
+        "duration_ms": 992.8300380706787,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 4,
+        "status_code": 502,
+        "duration_ms": 1175.0075817108154,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 2,
+        "status_code": 502,
+        "duration_ms": 1213.458776473999,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 1,
+        "status_code": 502,
+        "duration_ms": 1350.3944873809814,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 6,
+        "status_code": 502,
+        "duration_ms": 1269.7210311889648,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 7,
+        "status_code": 502,
+        "duration_ms": 1343.5213565826416,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 8,
+        "status_code": 502,
+        "duration_ms": 1301.9216060638428,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 9,
+        "status_code": 502,
+        "duration_ms": 1296.1828708648682,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 10,
+        "status_code": 502,
+        "duration_ms": 1168.7662601470947,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 11,
+        "status_code": 502,
+        "duration_ms": 1123.016357421875,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 13,
+        "status_code": 502,
+        "duration_ms": 1059.61275100708,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 15,
+        "status_code": 502,
+        "duration_ms": 1081.1896324157715,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 12,
+        "status_code": 502,
+        "duration_ms": 1273.5707759857178,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 14,
+        "status_code": 502,
+        "duration_ms": 1285.4652404785156,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 16,
+        "status_code": 502,
+        "duration_ms": 1332.951545715332,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 19,
+        "status_code": 502,
+        "duration_ms": 1113.2574081420898,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 17,
+        "status_code": 502,
+        "duration_ms": 1219.9668884277344,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 20,
+        "status_code": 502,
+        "duration_ms": 1118.5472011566162,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 18,
+        "status_code": 502,
+        "duration_ms": 1319.1919326782227,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 23,
+        "status_code": 502,
+        "duration_ms": 1053.0121326446533,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 22,
+        "status_code": 502,
+        "duration_ms": 1130.0015449523926,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 24,
+        "status_code": 502,
+        "duration_ms": 972.3758697509766,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 25,
+        "status_code": 502,
+        "duration_ms": 977.9806137084961,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 21,
+        "status_code": 502,
+        "duration_ms": 1279.5195579528809,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 29,
+        "status_code": 502,
+        "duration_ms": 1092.7634239196777,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 26,
+        "status_code": 502,
+        "duration_ms": 1246.2551593780518,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 27,
+        "status_code": 502,
+        "duration_ms": 1258.8365077972412,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 30,
+        "status_code": 502,
+        "duration_ms": 1312.5364780426025,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 28,
+        "status_code": 502,
+        "duration_ms": 1348.4036922454834,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 33,
+        "status_code": 502,
+        "duration_ms": 886.9833946228027,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 31,
+        "status_code": 502,
+        "duration_ms": 1298.7165451049805,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 32,
+        "status_code": 502,
+        "duration_ms": 1258.6653232574463,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 34,
+        "status_code": 502,
+        "duration_ms": 1125.1616477966309,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 35,
+        "status_code": 502,
+        "duration_ms": 1141.7720317840576,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 36,
+        "status_code": 502,
+        "duration_ms": 1082.9203128814697,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 37,
+        "status_code": 502,
+        "duration_ms": 869.3242073059082,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 38,
+        "status_code": 502,
+        "duration_ms": 1204.0538787841797,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 40,
+        "status_code": 502,
+        "duration_ms": 1193.5193538665771,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 39,
+        "status_code": 502,
+        "duration_ms": 1350.1167297363281,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 42,
+        "status_code": 502,
+        "duration_ms": 998.6422061920166,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 41,
+        "status_code": 502,
+        "duration_ms": 1233.9067459106445,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 43,
+        "status_code": 502,
+        "duration_ms": 922.8708744049072,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 44,
+        "status_code": 502,
+        "duration_ms": 1074.1164684295654,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 45,
+        "status_code": 502,
+        "duration_ms": 991.7783737182617,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 46,
+        "status_code": 502,
+        "duration_ms": 1258.183240890503,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 47,
+        "status_code": 502,
+        "duration_ms": 1236.206293106079,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 49,
+        "status_code": 502,
+        "duration_ms": 984.4970703125,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 48,
+        "status_code": 502,
+        "duration_ms": 1285.9833240509033,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 50,
+        "status_code": 502,
+        "duration_ms": 1125.030517578125,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      }
+    ]
+  },
+  "recovery": {
+    "phase": "3. Estado Recuperado (Post-Rollback)",
+    "total_requests": 50,
+    "successful_requests": 0,
+    "failed_requests": 50,
+    "error_rate_pct": 100.0,
+    "total_duration_sec": 0.23277926445007324,
+    "throughput_req_sec": 214.79576421087995,
+    "latency_avg_ms": 21.028199195861816,
+    "latency_min_ms": 11.420965194702148,
+    "latency_max_ms": 54.868221282958984,
+    "latency_p50_ms": 19.71721649169922,
+    "latency_p90_ms": 27.257204055786133,
+    "latency_p95_ms": 41.22114181518555,
+    "latency_p99_ms": 54.868221282958984,
+    "raw_results": [
+      {
+        "index": 1,
+        "status_code": 502,
+        "duration_ms": 12.725353240966797,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 2,
+        "status_code": 502,
+        "duration_ms": 15.859365463256836,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 3,
+        "status_code": 502,
+        "duration_ms": 15.516281127929688,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 4,
+        "status_code": 502,
+        "duration_ms": 17.734766006469727,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 5,
+        "status_code": 502,
+        "duration_ms": 22.6290225982666,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 6,
+        "status_code": 502,
+        "duration_ms": 21.573305130004883,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 8,
+        "status_code": 502,
+        "duration_ms": 18.08786392211914,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 7,
+        "status_code": 502,
+        "duration_ms": 20.679950714111328,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 9,
+        "status_code": 502,
+        "duration_ms": 26.584148406982422,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 10,
+        "status_code": 502,
+        "duration_ms": 21.22330665588379,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 12,
+        "status_code": 502,
+        "duration_ms": 18.199682235717773,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 13,
+        "status_code": 502,
+        "duration_ms": 20.368576049804688,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 11,
+        "status_code": 502,
+        "duration_ms": 27.257204055786133,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 14,
+        "status_code": 502,
+        "duration_ms": 22.87149429321289,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 16,
+        "status_code": 502,
+        "duration_ms": 17.649173736572266,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 17,
+        "status_code": 502,
+        "duration_ms": 16.279220581054688,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 15,
+        "status_code": 502,
+        "duration_ms": 26.049375534057617,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 21,
+        "status_code": 502,
+        "duration_ms": 14.44101333618164,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 20,
+        "status_code": 502,
+        "duration_ms": 16.80135726928711,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 18,
+        "status_code": 502,
+        "duration_ms": 28.94878387451172,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 19,
+        "status_code": 502,
+        "duration_ms": 20.508289337158203,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 22,
+        "status_code": 502,
+        "duration_ms": 19.312143325805664,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 26,
+        "status_code": 502,
+        "duration_ms": 12.948036193847656,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 23,
+        "status_code": 502,
+        "duration_ms": 17.010927200317383,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 25,
+        "status_code": 502,
+        "duration_ms": 18.181562423706055,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 24,
+        "status_code": 502,
+        "duration_ms": 20.570993423461914,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 27,
+        "status_code": 502,
+        "duration_ms": 26.491880416870117,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 28,
+        "status_code": 502,
+        "duration_ms": 16.0372257232666,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 29,
+        "status_code": 502,
+        "duration_ms": 16.520977020263672,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 30,
+        "status_code": 502,
+        "duration_ms": 19.71721649169922,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 32,
+        "status_code": 502,
+        "duration_ms": 14.477252960205078,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 33,
+        "status_code": 502,
+        "duration_ms": 20.22266387939453,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 34,
+        "status_code": 502,
+        "duration_ms": 22.057294845581055,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 35,
+        "status_code": 502,
+        "duration_ms": 18.401145935058594,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 31,
+        "status_code": 502,
+        "duration_ms": 41.22114181518555,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 36,
+        "status_code": 502,
+        "duration_ms": 19.256591796875,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 37,
+        "status_code": 502,
+        "duration_ms": 21.728992462158203,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 38,
+        "status_code": 502,
+        "duration_ms": 23.508310317993164,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 39,
+        "status_code": 502,
+        "duration_ms": 25.25782585144043,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 41,
+        "status_code": 502,
+        "duration_ms": 24.807214736938477,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 43,
+        "status_code": 502,
+        "duration_ms": 14.557600021362305,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 42,
+        "status_code": 502,
+        "duration_ms": 21.589279174804688,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 47,
+        "status_code": 502,
+        "duration_ms": 11.420965194702148,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 45,
+        "status_code": 502,
+        "duration_ms": 19.455909729003906,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 46,
+        "status_code": 502,
+        "duration_ms": 21.89326286315918,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 40,
+        "status_code": 502,
+        "duration_ms": 54.868221282958984,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 49,
+        "status_code": 502,
+        "duration_ms": 11.496543884277344,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 44,
+        "status_code": 502,
+        "duration_ms": 41.93377494812012,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 48,
+        "status_code": 502,
+        "duration_ms": 17.418622970581055,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      },
+      {
+        "index": 50,
+        "status_code": 502,
+        "duration_ms": 17.058849334716797,
+        "success": false,
+        "error": "{\"error\":\"triage service error\",\"code\":\"TRIAGE_ERROR\"}\n",
+        "response": null
+      }
+    ]
+  }
+}

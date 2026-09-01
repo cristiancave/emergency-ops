@@ -17,6 +17,7 @@ COPY go.work ./
 COPY pkg/go.mod pkg/go.sum ./pkg/
 COPY services/dispatch/go.mod services/dispatch/go.sum ./services/dispatch/
 COPY services/triage/go.mod services/triage/go.sum ./services/triage/
+COPY services/data/go.mod services/data/go.sum* ./services/data/
 
 WORKDIR /app/services/dispatch
 RUN go mod download

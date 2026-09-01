@@ -1,0 +1,42 @@
+{
+  "dashboard_name": "AWS Security Golden Signals & Threat Telemetry",
+  "aws_account_id": "149511939303",
+  "aws_region": "us-east-1",
+  "widgets": [
+    {
+      "title": "Failed Authentication & Unauthorized IAM Calls",
+      "type": "metric_counter",
+      "query": "SELECT COUNT(*) FROM AWSCloudTrail WHERE eventName IN ('ConsoleLoginFailure', 'AccessDenied', 'UnauthorizedOperation')",
+      "threshold": { "warning": 5, "critical": 15 }
+    },
+    {
+      "title": "Network Traffic Volume: East-West vs North-South (VPC Flow Logs)",
+      "type": "timeseries_chart",
+      "metrics": [
+        { "name": "aws_vpc_bytes_east_west_total", "unit": "Bytes" },
+        { "name": "aws_vpc_bytes_north_south_total", "unit": "Bytes" }
+      ]
+    },
+    {
+      "title": "Network Rejections Ratio (REJECT / ACCEPT)",
+      "type": "gauge",
+      "metric": "aws_vpc_flow_reject_rate_pct",
+      "target_slo_pct": 1.0
+    },
+    {
+      "title": "AWS Security Hub High / Critical Active Vulnerabilities (CVEs)",
+      "type": "finding_table",
+      "source": "AWS Security Hub / Amazon Inspector",
+      "active_findings": [
+        {
+          "finding_id": "ARN:AWS:SECURITYHUB:US-EAST-1:149511939303:FINDING/CVE-2026-3199",
+          "severity": "HIGH",
+          "cve": "CVE-2026-3199",
+          "resource_id": "arn:aws:ecr:us-east-1:149511939303:repository/dispatch-service",
+          "title": "Outdated Base Image Dependency Vulnerability",
+          "remediation": "Update alpine base image to 3.20.3 in Dockerfile"
+        }
+      ]
+    }
+  ]
+}

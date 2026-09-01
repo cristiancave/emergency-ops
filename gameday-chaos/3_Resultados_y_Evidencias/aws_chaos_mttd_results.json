@@ -1,0 +1,45 @@
+{
+  "experiment_1": {
+    "experiment_name": "Exp 1: Latencia 200ms en triage-service (AWS FIS)",
+    "chaos_type": "Network Latency Injection (200ms)",
+    "blast_radius": "chaos-triage HTTP endpoint :8081",
+    "baseline_metrics": {
+      "latency_p99_ms": 38.5,
+      "error_rate_pct": 0.0
+    },
+    "chaos_metrics": {
+      "latency_p99_ms": 242.8,
+      "error_rate_pct": 0.5
+    },
+    "target_mttd_seconds": 120,
+    "achieved_mttd_seconds": 30,
+    "mttd_goal_passed": true,
+    "slo_impact": {
+      "slo_target_ms": 250.0,
+      "slo_degraded": false,
+      "error_budget_burn_rate": "1.2x"
+    }
+  },
+  "experiment_2": {
+    "experiment_name": "Exp 2: Error Rate 10% en data-service (AWS RDS Connection Failure)",
+    "chaos_type": "Database Connection Drop & Fault Injection",
+    "blast_radius": "aws-data-service / RDS PostgreSQL pool",
+    "baseline_metrics": {
+      "latency_p99_ms": 42.0,
+      "error_rate_pct": 0.0
+    },
+    "chaos_metrics": {
+      "latency_p99_ms": 310.5,
+      "error_rate_pct": 10.2
+    },
+    "target_mttd_seconds": 120,
+    "achieved_mttd_seconds": 40,
+    "mttd_goal_passed": true,
+    "slo_impact": {
+      "slo_target_error_rate_pct": 1.0,
+      "slo_degraded": true,
+      "error_budget_consumed_pct": 28.5,
+      "error_budget_burn_rate": "14.4x (Fast Burn Alert Triggered)"
+    }
+  }
+}
